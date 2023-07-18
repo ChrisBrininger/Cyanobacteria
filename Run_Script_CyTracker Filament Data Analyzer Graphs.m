@@ -27,7 +27,7 @@ process(CT)
 
 
 %% Load Data
-B = filamentDataAnalyzer('\Users\Chris\Documents\Boulder\Lab Work\MatLab\Anabaena\2020.3.5 Anabaena Original 80 frame movie and mask\2020.3.5_ana33047_minusn_0003_Crop_series1.mat');
+B = filamentDataAnalyzer('\Users\Chris\Documents\Boulder\Filament_Testing\Test\2020.3.5_ana33047_minusn_0003_Crop_series1.mat');
 
 
 % Fix Time Stamps
