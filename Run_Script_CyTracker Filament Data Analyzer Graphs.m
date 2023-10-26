@@ -27,7 +27,7 @@ process(CT)
 
 
 %% Load Data
-B = filamentDataAnalyzer('\Users\Chris\Documents\Boulder\Lab Work\MatLab\Anabaena\2020.3.5 Anabaena Original 80 frame movie and mask\2020.3.5_ana33047_minusn_0003_Crop_series1.mat');
+B = filamentDataAnalyzer('\Users\Chris\Documents\Boulder\Filament_Testing\Test\2020.3.5_ana33047_minusn_0003_Crop_series1.mat');
 
 
 % Fix Time Stamps
@@ -103,6 +103,9 @@ cellnum=12;
 plot(B.Tracks(cellnum).Frames, B.Tracks(cellnum).Data.MicronsToHeterocysts)
 %% Plot the distance to nearest heterocyst in uM vs frame position
 
+plotstyle = 2;
+beforehetswap = 1;
+
 maxFil = [];
 maxDist = [];
 
@@ -135,8 +138,19 @@ for iFrame = 1:numel(B.FileMetadata.Timestamps)
             DistMat (iFrame,B.Tracks(iCell).Data.FilamentPosition{E})=B.Tracks(iCell).Data.MicronsToHeterocysts(E);
         end
     end
-end
+    
+ 
+  end
 
+  for iFrame = 1:numel(B.FileMetadata.Timestamps)
+      
+       if   sum(DistMat(iFrame,:),"omitnan") == 0
+      
+     DistMat(iFrame,DistMat(iFrame,:)==0)=1200;
+       end
+  end
+
+  
 x = 1:maxFil;
 y = 1:numel(B.FileMetadata.Timestamps);
 
@@ -146,15 +160,68 @@ figure(1)
 
 % surf(X,Y,DistMat)
 % colormap(jet)
-
-surfl(X,(.166666*Y),DistMat)
-% colormap(green)    % change color map
-shading interp    % interpolate colors across lines and faces
-
-
+if plotstyle == 1;
+    
+    surfl(X,(.166666*Y),DistMat)
+    % colormap(green)    % change color map
+    shading interp    % interpolate colors across lines and faces
+    
+elseif plotstyle == 2;
+    
+    surf(X,(.166666*Y),DistMat,'EdgeColor','none')
+    mycolormap = customcolormap([0 .3 .9 1], {'#FFFFFF','#b9b8b9','#2bbec0','#b57855'});
+    colormap(mycolormap);
+%     shading interp    % interpolate colors across lines and faces
+    colorbar;
+    
+elseif plotstyle == 3;
+    
+    surf(X,(.166666*Y),DistMat,'EdgeColor','none')
+    mycolormap = customcolormap([0 .3 .9 1], {'#000000','#b4c0c8','#ea3c3c','#29abe2'});
+    colormap(mycolormap);
+    
+%     shading interp    % interpolate colors across lines and faces
+    colorbar;
+    
+elseif plotstyle == 4;
+    
+    surf(X,(.166666*Y),DistMat)
+    mycolormap = customcolormap([0 .3 .9 1], {'#ffffff','#ffffff','#ff0000','#000000'});
+    colormap(mycolormap);
+    shading interp    % interpolate colors across lines and faces
+    colorbar;
+    
+elseif plotstyle == 5;
+    
+    %plot distance between heterocysts over time as violin plot
+    
+    Dist = NaN (1,numel(DistMat(:,1)));
+    
+    for iFrame = 1:numel(DistMat(:,1))
+        
+        if   sum(DistMat(iFrame,:),"omitnan") == 0
+            
+            DistMat(iFrame,DistMat(iFrame,:)==0)=1200;
+            
+        else
+            
+            p = DistMat(iFrame,:);
+            DistHet = findpeaks(p);
+            DistHet = 2*mean(DistHet);
+            
+            Dist(1,iFrame) = DistHet;
+            
+        end
+    end
+    
+    Dist(isnan(Dist))=max(Dist);
+    
+    plot(y,Dist)
+    
+end
 % mesh(X,Y,DistMat)
 
-% Peak finder for above graph, enter frame number below and run along with
+%% Peak finder for above graph, enter frame number below and run along with
 % the above script
 
 FrameNum = (80);
